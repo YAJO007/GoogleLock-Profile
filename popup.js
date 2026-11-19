@@ -4,9 +4,9 @@
   const lock = document.getElementById('lock');
 
   if (!s.hasPassword) {
-    status.textContent = 'STATUS: NOT CONFIGURED';
+    status.textContent = 'No password set yet.';
   } else {
-    status.textContent = 'STATUS: UNLOCKED · Alt+Shift+L';
+    status.textContent = 'Unlocked · Alt+Shift+L to lock';
     lock.classList.remove('hidden');
   }
 

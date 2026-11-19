@@ -161,7 +161,7 @@ async function tryUnlock(password) {
   await chrome.storage.local.set({ fails: newFails, lockoutUntil: until });
   return {
     ok: false,
-    error: 'รหัสผ่านไม่ถูกต้อง',
+    error: 'Incorrect password.',
     waitSeconds: until ? Math.ceil((until - now) / 1000) : 0
   };
 }
@@ -170,17 +170,17 @@ async function tryUnlock(password) {
 async function setPassword({ current, newPassword, idleMinutes }) {
   const existing = await hasPassword();
   if (existing) {
-    if (!(await isUnlocked())) return { ok: false, error: 'ต้องปลดล็อกก่อน' };
-    if (!(await checkPassword(current || ''))) return { ok: false, error: 'รหัสผ่านปัจจุบันไม่ถูกต้อง' };
+    if (!(await isUnlocked())) return { ok: false, error: 'Unlock the profile first.' };
+    if (!(await checkPassword(current || ''))) return { ok: false, error: 'Current password is incorrect.' };
   }
   const update = {};
   if (newPassword) {
-    if (newPassword.length < 6) return { ok: false, error: 'รหัสผ่านต้องยาวอย่างน้อย 6 ตัวอักษร' };
+    if (newPassword.length < 6) return { ok: false, error: 'Password must be at least 6 characters.' };
     const salt = b64(crypto.getRandomValues(new Uint8Array(16)));
     update.salt = salt;
     update.hash = await deriveHash(newPassword, salt);
   } else if (!existing) {
-    return { ok: false, error: 'กรุณาตั้งรหัสผ่าน' };
+    return { ok: false, error: 'Please set a password.' };
   }
   update.idleMinutes = Math.max(0, Math.min(240, parseInt(idleMinutes, 10) || 0));
   await chrome.storage.local.set(update);

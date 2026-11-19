@@ -2,37 +2,13 @@ const form = document.getElementById('form');
 const pw = document.getElementById('pw');
 const btn = document.getElementById('btn');
 const msg = document.getElementById('msg');
-const term = document.getElementById('term');
+const status = document.getElementById('status');
 let timer = null;
 
-/* boot-sequence typing effect */
-const bootLines = [
-  ['> initializing secure shell...', ''],
-  ['> session tokens .......... ', 'SEALED'],
-  ['> network traffic ......... ', 'BLOCKED'],
-  ['> awaiting authentication_', '']
-];
-(async () => {
-  for (const [text, tag] of bootLines) {
-    const line = document.createElement('div');
-    term.appendChild(line);
-    for (const ch of text) {
-      line.textContent += ch;
-      await new Promise((r) => setTimeout(r, 12));
-    }
-    if (tag) {
-      const s = document.createElement('span');
-      s.className = 'warn';
-      s.textContent = tag;
-      line.appendChild(s);
-    }
-  }
-})();
-
-function flash(cls) {
-  form.classList.remove('denied', 'granted');
+function shake() {
+  form.classList.remove('shake');
   void form.offsetWidth; // restart animation
-  form.classList.add(cls);
+  form.classList.add('shake');
 }
 
 function countdown(seconds) {
@@ -46,11 +22,10 @@ function countdown(seconds) {
       btn.disabled = false;
       pw.disabled = false;
       msg.textContent = '';
-      form.classList.remove('denied');
       pw.focus();
       return;
     }
-    msg.textContent = `⚠ INTRUSION DETECTED · ระบบล็อกชั่วคราว ${left}s`;
+    msg.textContent = `Too many attempts. Try again in ${left}s.`;
     left--;
   };
   tick();
@@ -60,21 +35,22 @@ function countdown(seconds) {
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
   btn.disabled = true;
-  msg.className = 'msg ok';
-  msg.textContent = 'DECRYPTING...';
+  msg.className = 'msg';
+  msg.textContent = 'Verifying…';
   const res = await chrome.runtime.sendMessage({ type: 'unlock', password: pw.value });
   pw.value = '';
   if (res?.ok) {
-    flash('granted');
     msg.className = 'msg ok';
-    msg.textContent = '✔ ACCESS GRANTED';
+    msg.textContent = 'Unlocked';
+    status.textContent = 'UNLOCKED';
+    status.classList.add('on');
     return; // background restores this tab to its original page
   }
-  flash('denied');
+  shake();
   msg.className = 'msg error';
   if (res?.waitSeconds) return countdown(res.waitSeconds);
   btn.disabled = false;
-  msg.textContent = '✖ ACCESS DENIED · ' + (res?.error || 'ปลดล็อกไม่สำเร็จ');
+  msg.textContent = res?.error || 'Unlock failed.';
   pw.focus();
 });
 

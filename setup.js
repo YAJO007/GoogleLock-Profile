@@ -1,16 +1,17 @@
 const $ = (id) => document.getElementById(id);
 let existing = false;
 
+function showExistingMode() {
+  $('title').textContent = 'Profile Lock settings';
+  $('currentWrap').classList.remove('hidden');
+  $('pw1Label').textContent = 'New password (leave blank to keep current)';
+}
+
 (async () => {
   const s = await chrome.runtime.sendMessage({ type: 'status' });
   existing = s.hasPassword;
   $('idle').value = s.hasPassword ? s.idleMinutes : 10;
-  if (existing) {
-    $('title').textContent = 'CONFIG';
-    $('title').dataset.text = 'CONFIG';
-    $('currentWrap').classList.remove('hidden');
-    $('pw1Label').textContent = 'NEW PASSPHRASE (เว้นว่างถ้าไม่เปลี่ยน)';
-  }
+  if (existing) showExistingMode();
   (existing ? $('current') : $('pw1')).focus();
 })();
 
@@ -21,12 +22,12 @@ $('form').addEventListener('submit', async (e) => {
   const pw1 = $('pw1').value;
   const pw2 = $('pw2').value;
 
-  if (!existing && !pw1) return (msg.textContent = 'กรุณาตั้งรหัสผ่าน');
-  if (pw1 !== pw2) return (msg.textContent = 'รหัสผ่านทั้งสองช่องไม่ตรงกัน');
+  if (!existing && !pw1) return (msg.textContent = 'Please set a password.');
+  if (pw1 !== pw2) return (msg.textContent = 'Passwords do not match.');
 
   $('btn').disabled = true;
   msg.className = 'msg';
-  msg.textContent = 'DEPLOYING...';
+  msg.textContent = 'Saving…';
   const res = await chrome.runtime.sendMessage({
     type: 'setPassword',
     current: $('current').value,
@@ -37,15 +38,14 @@ $('form').addEventListener('submit', async (e) => {
 
   if (res?.ok) {
     msg.className = 'msg ok';
-    msg.textContent = '✔ DEPLOYED · กด Alt+Shift+L เพื่อลองล็อก';
+    msg.textContent = 'Saved. Press Alt+Shift+L to try locking.';
     $('current').value = $('pw1').value = $('pw2').value = '';
     if (!existing) {
       existing = true;
-      $('currentWrap').classList.remove('hidden');
-      $('pw1Label').textContent = 'NEW PASSPHRASE (เว้นว่างถ้าไม่เปลี่ยน)';
+      showExistingMode();
     }
   } else {
     msg.className = 'msg error';
-    msg.textContent = res?.error || 'บันทึกไม่สำเร็จ';
+    msg.textContent = res?.error || 'Could not save settings.';
   }
 });

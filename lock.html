@@ -1,34 +1,31 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>🔒 ACCESS RESTRICTED</title>
+  <title>Profile Locked</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <canvas id="matrix"></canvas>
   <div class="page">
     <form class="card" id="form" autocomplete="off">
-      <div class="titlebar">
-        <span class="dot r"></span><span class="dot"></span><span class="dot"></span>
-        <span class="path">root@profile-lock:~# ./auth --secure</span>
+      <div class="badge" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+        </svg>
       </div>
-      <div class="body">
-        <div class="term" id="term"></div>
-        <h1 class="glitch" data-text="ACCESS RESTRICTED">ACCESS RESTRICTED</h1>
-        <p class="sub">โปรไฟล์นี้ถูกล็อก · ยืนยันตัวตนเพื่อเข้าสู่ระบบ</p>
-        <label for="pw">ENTER PASSPHRASE</label>
-        <div class="input-wrap"><input type="password" id="pw" autofocus spellcheck="false"></div>
-        <button type="submit" id="btn">[ Decrypt ]</button>
-        <div class="msg error" id="msg"></div>
-        <div class="footer">
-          <span>ENC: PBKDF2-SHA256</span>
-          <span>STATUS: <span class="blink">■</span> LOCKED</span>
-        </div>
+      <h1>Profile locked</h1>
+      <p class="sub">Enter your password to continue.<br>Your tabs will be restored.</p>
+      <label for="pw">Password</label>
+      <input type="password" id="pw" autofocus spellcheck="false">
+      <button type="submit" id="btn">Unlock</button>
+      <div class="msg" id="msg"></div>
+      <div class="meta">
+        <span>PBKDF2-SHA256</span>
+        <span class="status" id="status">LOCKED</span>
       </div>
     </form>
+    <div class="below">Press <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd> to lock anytime</div>
   </div>
-  <script src="matrix.js"></script>
   <script src="lock.js"></script>
 </body>
 </html>

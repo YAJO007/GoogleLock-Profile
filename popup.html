@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <link rel="stylesheet" href="style.css">
@@ -7,16 +7,15 @@
 <body class="popup">
   <div class="page">
     <div class="card">
-      <div class="titlebar">
-        <span class="dot r"></span><span class="dot"></span><span class="dot"></span>
-        <span class="path">profile-lock</span>
+      <div class="badge" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+        </svg>
       </div>
-      <div class="body">
-        <h1 class="glitch" data-text="PROFILE LOCK">PROFILE LOCK</h1>
-        <p class="sub" id="status">…</p>
-        <button id="lock" class="hidden">[ Lock Now ]</button>
-        <button id="settings" class="secondary">[ Config ]</button>
-      </div>
+      <h1>Profile Lock</h1>
+      <p class="sub" id="status">…</p>
+      <button id="lock" class="hidden">Lock now</button>
+      <button id="settings" class="secondary">Settings</button>
     </div>
   </div>
   <script src="popup.js"></script>
