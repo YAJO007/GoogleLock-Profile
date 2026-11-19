@@ -1,6 +1,7 @@
 // Visual effects: 3D particle globe, card tilt, HUD readouts, hex streams.
 (() => {
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // Always animate, even if the OS has animation effects turned off.
+  const reduce = false;
   const css = (name) => getComputedStyle(document.body).getPropertyValue(name).trim() || '#00f0ff';
 
   /* ---------- 3D particle globe ---------- */
