@@ -162,6 +162,8 @@ async function tryUnlock(password) {
   return {
     ok: false,
     error: 'Incorrect password.',
+    fails: newFails,
+    maxFree: MAX_FREE_ATTEMPTS,
     waitSeconds: until ? Math.ceil((until - now) / 1000) : 0
   };
 }

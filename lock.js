@@ -3,12 +3,30 @@ const pw = document.getElementById('pw');
 const btn = document.getElementById('btn');
 const msg = document.getElementById('msg');
 const status = document.getElementById('status');
+const count = document.getElementById('count');
+const tag = document.getElementById('tag');
+const title = document.getElementById('title');
 let timer = null;
 
-function shake() {
+function setTitle(text) {
+  title.textContent = text;
+  title.dataset.text = text;
+}
+
+function alarm() {
+  document.body.classList.remove('alarm');
   form.classList.remove('shake');
-  void form.offsetWidth; // restart animation
+  void form.offsetWidth; // restart animations
+  document.body.classList.add('alarm');
   form.classList.add('shake');
+  setTitle('Access Denied');
+  tag.textContent = '// INTRUSION ATTEMPT';
+  clearTimeout(alarm.t);
+  alarm.t = setTimeout(() => {
+    document.body.classList.remove('alarm');
+    setTitle('System Locked');
+    tag.textContent = '// RESTRICTED ZONE';
+  }, 2200);
 }
 
 function countdown(seconds) {
@@ -25,7 +43,7 @@ function countdown(seconds) {
       pw.focus();
       return;
     }
-    msg.textContent = `Too many attempts. Try again in ${left}s.`;
+    msg.textContent = `Lockout active · retry in ${left}s`;
     left--;
   };
   tick();
@@ -36,21 +54,26 @@ form.addEventListener('submit', async (e) => {
   e.preventDefault();
   btn.disabled = true;
   msg.className = 'msg';
-  msg.textContent = 'Verifying…';
+  msg.textContent = 'Verifying credentials…';
   const res = await chrome.runtime.sendMessage({ type: 'unlock', password: pw.value });
   pw.value = '';
   if (res?.ok) {
+    document.body.classList.add('granted');
+    setTitle('Access Granted');
+    tag.textContent = '// IDENTITY VERIFIED';
     msg.className = 'msg ok';
-    msg.textContent = 'Unlocked';
-    status.textContent = 'UNLOCKED';
+    msg.textContent = 'Restoring session…';
+    status.textContent = 'Unlocked';
     status.classList.add('on');
+    count.textContent = '';
     return; // background restores this tab to its original page
   }
-  shake();
+  alarm();
   msg.className = 'msg error';
+  if (res?.fails) count.textContent = `Attempt ${res.fails}`;
   if (res?.waitSeconds) return countdown(res.waitSeconds);
   btn.disabled = false;
-  msg.textContent = res?.error || 'Unlock failed.';
+  msg.textContent = res?.error || 'Authentication failed.';
   pw.focus();
 });
 

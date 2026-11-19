@@ -3,8 +3,9 @@ let existing = false;
 
 function showExistingMode() {
   $('title').textContent = 'Settings';
+  $('title').dataset.text = 'Settings';
   $('currentWrap').classList.remove('hidden');
-  $('pw1Label').textContent = 'New password (leave blank to keep current)';
+  $('pw1Label').textContent = 'New passphrase (blank = keep)';
 }
 
 (async () => {

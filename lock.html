@@ -2,30 +2,77 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Profile Locked</title>
+  <title>SYSTEM LOCKED</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="page">
-    <form class="card" id="form" autocomplete="off">
-      <div class="badge" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>
-        </svg>
-      </div>
-      <h1>Profile locked</h1>
-      <p class="sub">Enter your password to continue.<br>Your tabs will be restored.</p>
-      <label for="pw">Password</label>
-      <input type="password" id="pw" autofocus spellcheck="false">
-      <button type="submit" id="btn">Unlock</button>
-      <div class="msg" id="msg"></div>
-      <div class="meta">
-        <span>PBKDF2-SHA256</span>
-        <span class="status" id="status">LOCKED</span>
-      </div>
-    </form>
-    <div class="below">Press <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd> to lock anytime</div>
+  <div class="scene" aria-hidden="true">
+    <div class="sky"></div>
+    <div class="ceiling"></div>
+    <div class="floor"></div>
+    <div class="horizon"></div>
   </div>
+  <canvas id="globe" aria-hidden="true"></canvas>
+  <div class="stream left" aria-hidden="true"></div>
+  <div class="stream right" aria-hidden="true"></div>
+
+  <div class="hud tl" aria-hidden="true">
+    <div>มาฆบูชา.exe <span class="dim">// v1.5</span></div>
+    <div class="dim">SECURE SHELL · ACTIVE</div>
+  </div>
+  <div class="hud tr" aria-hidden="true">
+    <div id="clock">--</div>
+    <div class="dim">SESSION <span id="sid">----</span></div>
+  </div>
+  <div class="hud bl" aria-hidden="true">
+    <div><span class="red">■</span> NETWORK · BLOCKED</div>
+    <div><span class="red">■</span> SESSION DATA · SEALED</div>
+    <div class="dim">UPTIME <span id="uptime">00:00</span></div>
+  </div>
+  <div class="hud br" aria-hidden="true">
+    <div>KDF · PBKDF2-SHA256</div>
+    <div class="dim">310,000 ITERATIONS</div>
+  </div>
+
+  <div class="page">
+    <div class="tilt" id="tilt">
+      <form class="card" id="form" autocomplete="off">
+        <span class="bracket a"></span><span class="bracket b"></span>
+        <span class="bracket c"></span><span class="bracket d"></span>
+
+        <div class="core" aria-hidden="true">
+          <div class="ring r3"></div>
+          <div class="ring r1"></div>
+          <div class="ring r2"></div>
+          <div class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/><circle cx="12" cy="16" r="1.2"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="tag" id="tag">// RESTRICTED ZONE</div>
+        <h1 class="glitch" id="title" data-text="System Locked">System Locked</h1>
+        <p class="sub">Authentication required to access this profile.<br>Repeated failures trigger an escalating lockout.</p>
+
+        <div class="field">
+          <label for="pw"><span>Passphrase</span><span class="count" id="count"></span></label>
+          <input type="password" id="pw" autofocus spellcheck="false">
+        </div>
+        <button type="submit" id="btn">Authenticate</button>
+        <div class="msg" id="msg"></div>
+
+        <div class="meta">
+          <span>Salted hash · 256-bit</span>
+          <span class="status" id="status">Locked</span>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="fx-scan" aria-hidden="true"></div>
+  <div class="fx-flash" aria-hidden="true"></div>
+  <script src="fx.js"></script>
   <script src="lock.js"></script>
 </body>
 </html>

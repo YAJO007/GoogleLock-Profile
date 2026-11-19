@@ -5,37 +5,68 @@
   <title>มาฆบูชา.exe</title>
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
-  <div class="page">
-    <form class="card" id="form" autocomplete="off">
-      <div class="badge" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6l8-3z"/>
-        </svg>
-      </div>
-      <h1 id="title">Set up</h1>
-      <p class="sub">Chrome will lock this profile on every start<br>and whenever you press <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd>.</p>
-
-      <div id="currentWrap" class="hidden">
-        <label for="current">Current password</label>
-        <input type="password" id="current" spellcheck="false">
-      </div>
-
-      <label for="pw1" id="pw1Label">New password</label>
-      <input type="password" id="pw1" spellcheck="false">
-      <div class="hint" id="pw1Hint">At least 6 characters.</div>
-
-      <label for="pw2">Confirm new password</label>
-      <input type="password" id="pw2" spellcheck="false">
-
-      <label for="idle">Auto-lock after inactivity (minutes)</label>
-      <input type="number" id="idle" min="0" max="240" value="10">
-      <div class="hint">0 = off. Always locks when your computer screen locks.</div>
-
-      <button type="submit" id="btn">Save</button>
-      <div class="msg" id="msg"></div>
-    </form>
+<body style="overflow:auto">
+  <div class="scene" aria-hidden="true">
+    <div class="sky"></div>
+    <div class="ceiling"></div>
+    <div class="floor"></div>
+    <div class="horizon"></div>
   </div>
+  <canvas id="globe" aria-hidden="true"></canvas>
+
+  <div class="hud tl" aria-hidden="true">
+    <div>มาฆบูชา.exe <span class="dim">// config</span></div>
+    <div class="dim">SECURE SHELL · ACTIVE</div>
+  </div>
+  <div class="hud tr" aria-hidden="true"><div id="clock">--</div></div>
+
+  <div class="page">
+    <div class="tilt" id="tilt">
+      <form class="card" id="form" autocomplete="off">
+        <span class="bracket a"></span><span class="bracket b"></span>
+        <span class="bracket c"></span><span class="bracket d"></span>
+
+        <div class="core" aria-hidden="true">
+          <div class="ring r3"></div>
+          <div class="ring r1"></div>
+          <div class="ring r2"></div>
+          <div class="icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6l8-3z"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="tag">// CONFIGURATION</div>
+        <h1 class="glitch" id="title" data-text="Set up">Set up</h1>
+        <p class="sub">Locks on every start and on <kbd>Alt</kbd> + <kbd>Shift</kbd> + <kbd>L</kbd>.</p>
+
+        <div class="field">
+          <div id="currentWrap" class="hidden">
+            <label for="current"><span>Current passphrase</span></label>
+            <input type="password" id="current" spellcheck="false">
+          </div>
+
+          <label for="pw1"><span id="pw1Label">New passphrase</span></label>
+          <input type="password" id="pw1" spellcheck="false">
+          <div class="hint" id="pw1Hint">Minimum 6 characters.</div>
+
+          <label for="pw2"><span>Confirm passphrase</span></label>
+          <input type="password" id="pw2" spellcheck="false">
+
+          <label for="idle"><span>Auto-lock (minutes)</span></label>
+          <input type="number" id="idle" min="0" max="240" value="10">
+          <div class="hint">0 = off. Always locks when the screen locks.</div>
+        </div>
+
+        <button type="submit" id="btn">Deploy</button>
+        <div class="msg" id="msg"></div>
+      </form>
+    </div>
+  </div>
+
+  <div class="fx-scan" aria-hidden="true"></div>
+  <script src="fx.js"></script>
   <script src="setup.js"></script>
 </body>
 </html>
