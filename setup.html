@@ -2,36 +2,43 @@
 <html lang="th">
 <head>
   <meta charset="utf-8">
-  <title>ตั้งค่า Profile Lock</title>
+  <title>Profile Lock · CONFIG</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <canvas id="matrix"></canvas>
   <div class="page">
     <form class="card" id="form" autocomplete="off">
-      <div class="icon">🛡️</div>
-      <h1 id="title">ตั้งรหัสผ่านล็อกโปรไฟล์</h1>
-      <p class="sub">Chrome จะถูกล็อกทุกครั้งที่เปิดใหม่ และเมื่อคุณกดล็อก (Alt+Shift+L)</p>
-
-      <div id="currentWrap" class="hidden">
-        <label for="current">รหัสผ่านปัจจุบัน</label>
-        <input type="password" id="current">
+      <div class="titlebar">
+        <span class="dot r"></span><span class="dot"></span><span class="dot"></span>
+        <span class="path">root@profile-lock:~# ./configure</span>
       </div>
+      <div class="body">
+        <h1 class="glitch" id="title" data-text="INIT LOCK">INIT LOCK</h1>
+        <p class="sub">ตั้งรหัสผ่าน · Chrome จะล็อกทุกครั้งที่เปิด และเมื่อกด Alt+Shift+L</p>
 
-      <label for="pw1" id="pw1Label">รหัสผ่านใหม่</label>
-      <input type="password" id="pw1">
-      <div class="hint" id="pw1Hint">อย่างน้อย 6 ตัวอักษร</div>
+        <div id="currentWrap" class="hidden">
+          <label for="current">CURRENT PASSPHRASE</label>
+          <div class="input-wrap"><input type="password" id="current" spellcheck="false"></div>
+        </div>
 
-      <label for="pw2">ยืนยันรหัสผ่านใหม่</label>
-      <input type="password" id="pw2">
+        <label for="pw1" id="pw1Label">NEW PASSPHRASE</label>
+        <div class="input-wrap"><input type="password" id="pw1" spellcheck="false"></div>
+        <div class="hint" id="pw1Hint">อย่างน้อย 6 ตัวอักษร</div>
 
-      <label for="idle">ล็อกอัตโนมัติเมื่อไม่ได้ใช้งาน (นาที)</label>
-      <input type="number" id="idle" min="0" max="240" value="10">
-      <div class="hint">ใส่ 0 เพื่อปิด · ล็อกเสมอเมื่อหน้าจอคอมพิวเตอร์ถูกล็อก</div>
+        <label for="pw2">CONFIRM PASSPHRASE</label>
+        <div class="input-wrap"><input type="password" id="pw2" spellcheck="false"></div>
 
-      <button type="submit" id="btn">บันทึก</button>
-      <div class="msg" id="msg"></div>
+        <label for="idle">AUTO-LOCK TIMEOUT (MIN)</label>
+        <div class="input-wrap"><input type="number" id="idle" min="0" max="240" value="10"></div>
+        <div class="hint">0 = ปิด · ล็อกเสมอเมื่อหน้าจอคอมพิวเตอร์ถูกล็อก</div>
+
+        <button type="submit" id="btn">[ Deploy ]</button>
+        <div class="msg" id="msg"></div>
+      </div>
     </form>
   </div>
+  <script src="matrix.js"></script>
   <script src="setup.js"></script>
 </body>
 </html>

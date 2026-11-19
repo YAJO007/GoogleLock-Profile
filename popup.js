@@ -4,9 +4,9 @@
   const lock = document.getElementById('lock');
 
   if (!s.hasPassword) {
-    status.textContent = 'ยังไม่ได้ตั้งรหัสผ่าน';
+    status.textContent = 'STATUS: NOT CONFIGURED';
   } else {
-    status.textContent = 'ปลดล็อกอยู่ · Alt+Shift+L เพื่อล็อก';
+    status.textContent = 'STATUS: UNLOCKED · Alt+Shift+L';
     lock.classList.remove('hidden');
   }
 

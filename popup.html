@@ -5,12 +5,19 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body class="popup">
-  <div class="card">
-    <div class="icon">🔐</div>
-    <h1>Profile Lock</h1>
-    <p class="sub" id="status">…</p>
-    <button id="lock" class="hidden">ล็อกตอนนี้</button>
-    <button id="settings" class="secondary">ตั้งค่า</button>
+  <div class="page">
+    <div class="card">
+      <div class="titlebar">
+        <span class="dot r"></span><span class="dot"></span><span class="dot"></span>
+        <span class="path">profile-lock</span>
+      </div>
+      <div class="body">
+        <h1 class="glitch" data-text="PROFILE LOCK">PROFILE LOCK</h1>
+        <p class="sub" id="status">…</p>
+        <button id="lock" class="hidden">[ Lock Now ]</button>
+        <button id="settings" class="secondary">[ Config ]</button>
+      </div>
+    </div>
   </div>
   <script src="popup.js"></script>
 </body>

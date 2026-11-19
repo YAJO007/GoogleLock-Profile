@@ -6,9 +6,10 @@ let existing = false;
   existing = s.hasPassword;
   $('idle').value = s.hasPassword ? s.idleMinutes : 10;
   if (existing) {
-    $('title').textContent = 'ตั้งค่า Profile Lock';
+    $('title').textContent = 'CONFIG';
+    $('title').dataset.text = 'CONFIG';
     $('currentWrap').classList.remove('hidden');
-    $('pw1Label').textContent = 'รหัสผ่านใหม่ (เว้นว่างถ้าไม่เปลี่ยน)';
+    $('pw1Label').textContent = 'NEW PASSPHRASE (เว้นว่างถ้าไม่เปลี่ยน)';
   }
   (existing ? $('current') : $('pw1')).focus();
 })();
@@ -25,7 +26,7 @@ $('form').addEventListener('submit', async (e) => {
 
   $('btn').disabled = true;
   msg.className = 'msg';
-  msg.textContent = 'กำลังบันทึก…';
+  msg.textContent = 'DEPLOYING...';
   const res = await chrome.runtime.sendMessage({
     type: 'setPassword',
     current: $('current').value,
@@ -36,12 +37,12 @@ $('form').addEventListener('submit', async (e) => {
 
   if (res?.ok) {
     msg.className = 'msg ok';
-    msg.textContent = 'บันทึกแล้ว ✓ กด Alt+Shift+L เพื่อลองล็อก';
+    msg.textContent = '✔ DEPLOYED · กด Alt+Shift+L เพื่อลองล็อก';
     $('current').value = $('pw1').value = $('pw2').value = '';
     if (!existing) {
       existing = true;
       $('currentWrap').classList.remove('hidden');
-      $('pw1Label').textContent = 'รหัสผ่านใหม่ (เว้นว่างถ้าไม่เปลี่ยน)';
+      $('pw1Label').textContent = 'NEW PASSPHRASE (เว้นว่างถ้าไม่เปลี่ยน)';
     }
   } else {
     msg.className = 'msg error';

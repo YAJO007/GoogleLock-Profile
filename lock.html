@@ -2,21 +2,33 @@
 <html lang="th">
 <head>
   <meta charset="utf-8">
-  <title>🔒 โปรไฟล์ถูกล็อก</title>
+  <title>🔒 ACCESS RESTRICTED</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <canvas id="matrix"></canvas>
   <div class="page">
     <form class="card" id="form" autocomplete="off">
-      <div class="icon">🔒</div>
-      <h1>โปรไฟล์นี้ถูกล็อก</h1>
-      <p class="sub">ใส่รหัสผ่านเพื่อปลดล็อก แท็บทั้งหมดจะกลับมาเหมือนเดิม</p>
-      <label for="pw">รหัสผ่าน</label>
-      <input type="password" id="pw" autofocus>
-      <button type="submit" id="btn">ปลดล็อก</button>
-      <div class="msg error" id="msg"></div>
+      <div class="titlebar">
+        <span class="dot r"></span><span class="dot"></span><span class="dot"></span>
+        <span class="path">root@profile-lock:~# ./auth --secure</span>
+      </div>
+      <div class="body">
+        <div class="term" id="term"></div>
+        <h1 class="glitch" data-text="ACCESS RESTRICTED">ACCESS RESTRICTED</h1>
+        <p class="sub">โปรไฟล์นี้ถูกล็อก · ยืนยันตัวตนเพื่อเข้าสู่ระบบ</p>
+        <label for="pw">ENTER PASSPHRASE</label>
+        <div class="input-wrap"><input type="password" id="pw" autofocus spellcheck="false"></div>
+        <button type="submit" id="btn">[ Decrypt ]</button>
+        <div class="msg error" id="msg"></div>
+        <div class="footer">
+          <span>ENC: PBKDF2-SHA256</span>
+          <span>STATUS: <span class="blink">■</span> LOCKED</span>
+        </div>
+      </div>
     </form>
   </div>
+  <script src="matrix.js"></script>
   <script src="lock.js"></script>
 </body>
 </html>
