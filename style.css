@@ -13,7 +13,8 @@
   --glass: rgba(6, 10, 24, 0.72);
   --text: #e8fbff;
   --muted: #7fa6b5;
-  --head: "Bahnschrift", "DIN Alternate", "Segoe UI", system-ui, sans-serif;
+  --head: "Bahnschrift", "DIN Alternate", "Segoe UI", "Leelawadee UI", "Noto Sans Thai", system-ui, sans-serif;
+  --thai: "Leelawadee UI", "Noto Sans Thai", "Sarabun", "Segoe UI", sans-serif;
   --mono: "Cascadia Code", "JetBrains Mono", Consolas, "SF Mono", Menlo, monospace;
 }
 body.alarm { --c1: #ff2e4d; --c2: #ff8a00; }
@@ -331,6 +332,9 @@ body.alarm .fx-flash { animation: flash 0.5s ease-out; }
 @keyframes flash { 0% { opacity: 1; } 100% { opacity: 0; } }
 
 @media (max-width: 820px) { .stream, .hud.bl, .hud.br { display: none; } }
+
+p.sub.thai { font-family: var(--thai); font-size: 13px; line-height: 1.7; letter-spacing: 0; color: #b9d3dc; }
+p.sub.thai b { color: var(--c1); font-weight: 600; text-shadow: 0 0 8px color-mix(in srgb, var(--c1) 60%, transparent); }
 
 /* ---------- popup ---------- */
 body.popup { width: 300px; height: auto; overflow: auto; }
