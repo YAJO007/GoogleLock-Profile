@@ -2,7 +2,7 @@ const $ = (id) => document.getElementById(id);
 let existing = false;
 
 function showExistingMode() {
-  $('title').textContent = 'Profile Lock settings';
+  $('title').textContent = 'Settings';
   $('currentWrap').classList.remove('hidden');
   $('pw1Label').textContent = 'New password (leave blank to keep current)';
 }
