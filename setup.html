@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="utf-8">
+  <title>ตั้งค่า Profile Lock</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="page">
+    <form class="card" id="form" autocomplete="off">
+      <div class="icon">🛡️</div>
+      <h1 id="title">ตั้งรหัสผ่านล็อกโปรไฟล์</h1>
+      <p class="sub">Chrome จะถูกล็อกทุกครั้งที่เปิดใหม่ และเมื่อคุณกดล็อก (Alt+Shift+L)</p>
+
+      <div id="currentWrap" class="hidden">
+        <label for="current">รหัสผ่านปัจจุบัน</label>
+        <input type="password" id="current">
+      </div>
+
+      <label for="pw1" id="pw1Label">รหัสผ่านใหม่</label>
+      <input type="password" id="pw1">
+      <div class="hint" id="pw1Hint">อย่างน้อย 6 ตัวอักษร</div>
+
+      <label for="pw2">ยืนยันรหัสผ่านใหม่</label>
+      <input type="password" id="pw2">
+
+      <label for="idle">ล็อกอัตโนมัติเมื่อไม่ได้ใช้งาน (นาที)</label>
+      <input type="number" id="idle" min="0" max="240" value="10">
+      <div class="hint">ใส่ 0 เพื่อปิด · ล็อกเสมอเมื่อหน้าจอคอมพิวเตอร์ถูกล็อก</div>
+
+      <button type="submit" id="btn">บันทึก</button>
+      <div class="msg" id="msg"></div>
+    </form>
+  </div>
+  <script src="setup.js"></script>
+</body>
+</html>
