@@ -1,0 +1,5 @@
+Windows Registry Editor Version 5.00
+
+; Block Chrome DevTools everywhere (prevents bypassing Profile Lock via F12 on the lock page)
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Google\Chrome]
+"DeveloperToolsAvailability"=dword:00000002

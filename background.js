@@ -5,6 +5,42 @@ const NEW_TAB = 'chrome://newtab/';
 const PBKDF2_ITERATIONS = 310000;
 const MAX_FREE_ATTEMPTS = 5;
 
+/* ---------- network-level lock ----------
+ * A persistent *dynamic* rule blocks every http(s) request. Unlocking adds a
+ * higher-priority *session* "allow" rule. Session rules are wiped by Chrome
+ * whenever the browser shuts down, so after any restart (or crash) the block
+ * is already active before this service worker even wakes up — pages such as
+ * Gmail can't flash on screen while tabs are being restored.
+ */
+const BLOCK_RULE_ID = 1;
+const ALLOW_RULE_ID = 2;
+const ALL_TYPES = [
+  'main_frame', 'sub_frame', 'stylesheet', 'script', 'image', 'font', 'object',
+  'xmlhttprequest', 'ping', 'csp_report', 'media', 'websocket', 'other'
+];
+const ruleFor = (id, priority, type) => ({
+  id,
+  priority,
+  action: { type },
+  condition: { urlFilter: '|http', resourceTypes: ALL_TYPES }
+});
+
+async function installBlockRule() {
+  await chrome.declarativeNetRequest.updateDynamicRules({
+    removeRuleIds: [BLOCK_RULE_ID],
+    addRules: [ruleFor(BLOCK_RULE_ID, 1, 'block')]
+  });
+}
+async function allowTraffic() {
+  await chrome.declarativeNetRequest.updateSessionRules({
+    removeRuleIds: [ALLOW_RULE_ID],
+    addRules: [ruleFor(ALLOW_RULE_ID, 2, 'allow')]
+  });
+}
+async function blockTraffic() {
+  await chrome.declarativeNetRequest.updateSessionRules({ removeRuleIds: [ALLOW_RULE_ID] });
+}
+
 /* ---------- crypto helpers ---------- */
 const b64 = (bytes) => btoa(String.fromCharCode(...bytes));
 const unb64 = (s) => Uint8Array.from(atob(s), (c) => c.charCodeAt(0));
@@ -51,12 +87,12 @@ const serial = (fn) => (queue = queue.then(fn, fn));
 function rememberUrl(tabId, url) {
   return serial(async () => {
     const { savedUrls = {} } = await chrome.storage.session.get('savedUrls');
-    if (url && !url.startsWith(LOCK_PAGE)) savedUrls[tabId] = url;
+    if (url && !url.startsWith(LOCK_PAGE) && !savedUrls[tabId]) savedUrls[tabId] = url;
     await chrome.storage.session.set({ savedUrls });
   });
 }
 
-/* ---------- guarding ---------- */
+/* ---------- guarding tabs ---------- */
 async function guardTab(tab) {
   if (!tab || tab.id === undefined || tab.id < 0) return;
   const url = tab.pendingUrl || tab.url || '';
@@ -76,9 +112,14 @@ async function guardAllTabs() {
   await Promise.all(tabs.map(guardTab));
 }
 
+async function setLocked() {
+  await blockTraffic();
+  await chrome.storage.session.set({ unlocked: false });
+}
+
 async function lockNow() {
   if (!(await hasPassword())) return;
-  await chrome.storage.session.set({ unlocked: false });
+  await setLocked();
   await guardAllTabs();
 }
 
@@ -95,15 +136,19 @@ async function restoreTabs() {
   await chrome.storage.session.set({ savedUrls: {} });
 }
 
-/* ---------- unlock with brute-force throttling ---------- */
+/* ---------- unlock with brute-force throttling ----------
+ * The failure counter lives in storage.local so restarting Chrome does NOT reset it.
+ */
 async function tryUnlock(password) {
-  const { fails = 0, lockoutUntil = 0 } = await chrome.storage.session.get(['fails', 'lockoutUntil']);
+  const { fails = 0, lockoutUntil = 0 } = await chrome.storage.local.get(['fails', 'lockoutUntil']);
   const now = Date.now();
   if (now < lockoutUntil) {
     return { ok: false, waitSeconds: Math.ceil((lockoutUntil - now) / 1000) };
   }
   if (await checkPassword(password || '')) {
-    await chrome.storage.session.set({ unlocked: true, fails: 0, lockoutUntil: 0 });
+    await chrome.storage.local.set({ fails: 0, lockoutUntil: 0 });
+    await allowTraffic();
+    await chrome.storage.session.set({ unlocked: true });
     await restoreTabs();
     return { ok: true };
   }
@@ -113,7 +158,7 @@ async function tryUnlock(password) {
     const secs = Math.min(30 * 2 ** (newFails - MAX_FREE_ATTEMPTS), 15 * 60);
     until = now + secs * 1000;
   }
-  await chrome.storage.session.set({ fails: newFails, lockoutUntil: until });
+  await chrome.storage.local.set({ fails: newFails, lockoutUntil: until });
   return {
     ok: false,
     error: 'รหัสผ่านไม่ถูกต้อง',
@@ -123,7 +168,8 @@ async function tryUnlock(password) {
 
 /* ---------- settings ---------- */
 async function setPassword({ current, newPassword, idleMinutes }) {
-  if (await hasPassword()) {
+  const existing = await hasPassword();
+  if (existing) {
     if (!(await isUnlocked())) return { ok: false, error: 'ต้องปลดล็อกก่อน' };
     if (!(await checkPassword(current || ''))) return { ok: false, error: 'รหัสผ่านปัจจุบันไม่ถูกต้อง' };
   }
@@ -133,12 +179,14 @@ async function setPassword({ current, newPassword, idleMinutes }) {
     const salt = b64(crypto.getRandomValues(new Uint8Array(16)));
     update.salt = salt;
     update.hash = await deriveHash(newPassword, salt);
-  } else if (!(await hasPassword())) {
+  } else if (!existing) {
     return { ok: false, error: 'กรุณาตั้งรหัสผ่าน' };
   }
-  const mins = Math.max(0, Math.min(240, parseInt(idleMinutes, 10) || 0));
-  update.idleMinutes = mins;
+  update.idleMinutes = Math.max(0, Math.min(240, parseInt(idleMinutes, 10) || 0));
   await chrome.storage.local.set(update);
+  // Order matters: allow first, then install the persistent block.
+  await allowTraffic();
+  await installBlockRule();
   await chrome.storage.session.set({ unlocked: true });
   await applyIdleSetting();
   return { ok: true };
@@ -149,26 +197,41 @@ async function applyIdleSetting() {
   if (idleMinutes > 0) chrome.idle.setDetectionInterval(Math.max(15, idleMinutes * 60));
 }
 
+// Keep network rules consistent with the stored state every time the worker wakes.
+async function syncRules() {
+  if (!(await hasPassword())) {
+    await chrome.declarativeNetRequest.updateDynamicRules({ removeRuleIds: [BLOCK_RULE_ID] });
+    return;
+  }
+  await installBlockRule();
+  if (!(await isUnlocked())) await blockTraffic();
+}
+
 /* ---------- events ---------- */
 chrome.runtime.onInstalled.addListener(async (details) => {
-  if (details.reason === 'install' || !(await hasPassword())) {
-    chrome.tabs.create({ url: SETUP_PAGE });
-  }
+  await syncRules();
   applyIdleSetting();
+  if (!(await hasPassword())) {
+    chrome.tabs.create({ url: SETUP_PAGE });
+  } else {
+    // Extension updated/reloaded: lock right away.
+    await lockNow();
+  }
 });
 
 chrome.runtime.onStartup.addListener(async () => {
-  await chrome.storage.session.set({ unlocked: false });
+  await setLocked();
+  await syncRules();
   applyIdleSetting();
   guardAllTabs();
 });
 
-// When the last window of this profile closes (e.g. user goes back to the profile picker),
-// lock immediately so re-entering the profile requires the password again.
+// Last window of this profile closed (e.g. back to the profile picker) → lock.
 chrome.windows.onRemoved.addListener(async () => {
   const wins = await chrome.windows.getAll();
   if (wins.length === 0 && (await hasPassword())) {
-    await chrome.storage.session.set({ unlocked: false, savedUrls: {} });
+    await setLocked();
+    await chrome.storage.session.set({ savedUrls: {} });
   }
 });
 
@@ -200,6 +263,10 @@ chrome.commands.onCommand.addListener((cmd) => {
 });
 
 chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+  // Only accept messages from this extension's own pages.
+  if (sender.id !== chrome.runtime.id || (sender.url && !sender.url.startsWith(chrome.runtime.getURL('')))) {
+    return false;
+  }
   (async () => {
     switch (msg?.type) {
       case 'unlock':
@@ -222,3 +289,4 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 
 // Service worker can be restarted at any time — re-apply settings each time it wakes.
 applyIdleSetting();
+syncRules();

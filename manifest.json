@@ -1,9 +1,10 @@
 {
   "manifest_version": 3,
   "name": "Profile Lock",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "ล็อกโปรไฟล์ Chrome ด้วยรหัสผ่าน ป้องกันคนอื่นเปิดดูอีเมลและเว็บที่ล็อกอินไว้",
-  "permissions": ["storage", "tabs", "idle"],
+  "minimum_chrome_version": "116",
+  "permissions": ["storage", "tabs", "idle", "declarativeNetRequest"],
   "background": {
     "service_worker": "background.js"
   },

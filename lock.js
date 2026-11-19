@@ -42,3 +42,15 @@ form.addEventListener('submit', async (e) => {
 });
 
 // If another tab unlocked the profile, this tab will be navigated away by background.
+
+// Deterrent only: discourage opening DevTools on the lock page.
+// The real protection is the DeveloperToolsAvailability policy (see policy/).
+document.addEventListener('contextmenu', (e) => e.preventDefault());
+document.addEventListener('keydown', (e) => {
+  const k = e.key.toUpperCase();
+  if (k === 'F12' || ((e.ctrlKey || e.metaKey) && e.shiftKey && ['I', 'J', 'C'].includes(k)) ||
+      ((e.ctrlKey || e.metaKey) && k === 'U')) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+}, true);
